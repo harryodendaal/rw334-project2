@@ -1,0 +1,11 @@
+authentication tutorial i used: https://www.youtube.com/watch?v=WxGBoY5iNXY&t=282s
+
+
+backend information:
+
+
+
+todo:
+1 enviorment variable for secret
+2 creates routes with blueprint (not used before)
+3 create extra field in user model which is public key?
