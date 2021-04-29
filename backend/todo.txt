@@ -1,4 +1,5 @@
 authentication tutorial i used: https://www.youtube.com/watch?v=WxGBoY5iNXY&t=282s
+authentication blogpost: https://github.com/realpython/flask-jwt-auth/blob/master/project/server/models.py
 docker - flask: https://www.youtube.com/watch?v=wrMJoKpK2mk
 docker - postgres: https://haseebmajid.dev/blog/simple-app-flask-sqlalchemy-and-docker
 backend information:
