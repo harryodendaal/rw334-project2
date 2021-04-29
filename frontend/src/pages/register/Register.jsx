@@ -1,32 +1,30 @@
 import React from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import styled from "./register.module.css";
 import axiosInstance from "../../api/axios";
 import { useHistory } from "react-router-dom";
 
-import styled from "./login.module.css";
-
-const loginValidation = Yup.object().shape({
+const regValidation = Yup.object().shape({
   username: Yup.string().required("Email is required"),
   password: Yup.string()
     .required("Password is required")
     .min(12, "password needs to be atleast 12 characters long"),
 });
 
-export const Login = ({ changeToken }) => {
+export const Register = ({ changeToken }) => {
   const history = useHistory();
   return (
     <div className={styled.container}>
       <div className={styled.border}>
-        <h1>Login</h1>
+        <h1>Register</h1>
         <Formik
-          validationSchema={loginValidation}
+          validationSchema={regValidation}
           initialValues={{ username: "", password: "" }}
           onSubmit={(values) => {
             console.log(values);
-
             axiosInstance
-              .post("login", {
+              .post("register", {
                 username: values.username,
                 password: values.password,
               })
@@ -51,7 +49,7 @@ export const Login = ({ changeToken }) => {
             handleBlur,
             isSubmitting,
           }) => (
-            <form onSubmit={handleSubmit} className={styled.container}>
+            <form onSubmit={handleSubmit}>
               <input
                 className={styled.input}
                 type="text"
@@ -70,7 +68,9 @@ export const Login = ({ changeToken }) => {
                 value={values.password}
               />
               {errors.password && touched.password && errors.password}
-              <button type="submit">Submit</button>
+              <button type="submit" disabled={isSubmitting}>
+                Submit
+              </button>
             </form>
           )}
         </Formik>
