@@ -1,10 +1,10 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, json, request, jsonify, make_response
 from flask_cors import cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from . import db
-from .models import User
+from .database.models.user import User
+from .database.models.queries import get_all, add_instance, edit_instance, delete_instance, commit_changes
 import jwt
 import datetime
 
@@ -29,7 +29,7 @@ def token_required(func):
   return decorated
 
 
-@auth.route('/hello',methods=['POST'])
+@auth.route('/hello',methods=['POST', 'GET'])
 def hello():
   return {"message":"hello"}
 
@@ -37,9 +37,8 @@ def hello():
 def register():
   data = request.get_json()
   hashed_password = generate_password_hash(data['password'], method='sha256')
-  new_user = User(username = data['username'], password=hashed_password)
-  db.session.add(new_user)
-  db.session.commit()
+  add_instance(User, username=data['username'], password=data['password'])
+  commit_changes()
   return jsonify({"message":"User Created"})
 
 
@@ -61,6 +60,18 @@ def login():
     return jsonify({'token' : token})
 
   return jsonify({'message' : 'could not verify'})
+
+@auth.route('/users', methods=['GET'])
+def returnUsers():
+  users = get_all(User)
+  all_users = []
+  for user in users:
+    new_user = {
+      "username":user.username
+    }
+
+    all_users.append(new_user)
+  return json.dumps(all_users),200
 
 @auth.route('/secure', methods=['GET'])
 @token_required
