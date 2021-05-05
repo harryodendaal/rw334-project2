@@ -53,6 +53,9 @@ export const Navbar = ({ token, changeToken }) => {
               <Link to="">Home</Link>
             </li>
             <li>
+              <Link to="/graphs">Graphs</Link>
+            </li>
+            <li>
               <Link to="/register">Register</Link>
             </li>
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Route, BrowserRouter as Router} from 'react-router-dom'
-import {home,Login,Register } from './pages/index';
+import {home,Login,Register,Graphs } from './pages/index';
 import {Navbar} from './components/index'
 
 import "./App.css"
@@ -22,6 +22,7 @@ function App() {
     <Router>
       <Navbar token={token} changeToken={changeTokenState}/>
       <Route exact path='/' component= {home}/>
+      <Route exact path='/graphs' component= {Graphs}/>
       <Route exact path='/login'>
         <Login changeToken={changeTokenState}/>
       </Route>

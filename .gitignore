@@ -145,7 +145,7 @@ cython_debug/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+frontend/node_modules
 /.pnp
 .pnp.js
 
@@ -165,3 +165,5 @@ cython_debug/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+*.vscode/
