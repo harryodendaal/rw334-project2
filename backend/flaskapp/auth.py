@@ -1,9 +1,7 @@
 from flask import Blueprint, json, request, jsonify, make_response
-from flask_cors import cross_origin
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from .database.models.user import BlacklistToken, User
+from .database.models.user import User, WhiteListToken
 from .database.models import db
 import jwt
 import datetime
@@ -22,10 +20,17 @@ def token_required(func):
             return jsonify({"message": "Token is missing!"}), 401
         data = jwt.decode(token,  app.config.get(
             "SECRET_KEY"), algorithms='HS256')
+
         try:
-            current_user = User.query.filter_by(id=data['sub']).first()
+            current_user:User = User.query.filter_by(id=data['sub']).first()
+            is_white_listed_token = current_user.decode_auth_token(token)
+
+            if is_white_listed_token == 'Token is not in whitelistedToken table':
+                return jsonify({"message":"Token is not whitelisted"}), 401
         except:
             return jsonify({'message': 'Token is invalid!'}), 401
+
+        
         return func(current_user, *args, **kwargs)
     return decorated
 
@@ -120,15 +125,9 @@ def logout(current_user):
     if auth_token:
         resp = User.decode_auth_token(auth_token)
         if not isinstance(resp, str):
-            print('ye')
-            # decode_auth_token returned not string
-            # thus not blacklisted yet
-
-            # blacklist token
-            blacklisted_token = BlacklistToken(token=auth_token)
             try:
-                # insert the token
-                db.session.add(blacklisted_token)
+                #also have to remove the whitelisted token from database
+                WhiteListToken.query.filter_by(token=auth_token).delete()
                 db.session.commit()
                 responseObject = {
                     'message': 'Logging out'
@@ -140,11 +139,10 @@ def logout(current_user):
                 }
                 return make_response(jsonify(responseObject)), 400
         else:
-            print('ye2')
             responseObject = {
                 'message': resp
             }
-            return make_response(jsonify(responseObject)), 200
+            return make_response(jsonify(responseObject)), 401
     else:
         responseObject = {
             'message': 'non valid auth token'
