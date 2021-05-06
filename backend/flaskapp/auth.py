@@ -6,9 +6,9 @@ from .database.models import db
 import jwt
 import datetime
 from flaskapp import app
+import re
 
 auth = Blueprint('auth', __name__)
-
 
 def token_required(func):
     @wraps(func)
@@ -47,6 +47,14 @@ def register():
     # check if user already exists
     user = User.query.filter_by(username=data.get('email')).first()
     if not user:
+        reg = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+        password = data['password']
+        pattern = re.compile(reg)
+        match = re.search(pattern, password)
+        print(match)
+
+        if not match:
+            return make_response({"message":"password is invalid"}),401 
         try:
             hashed_password = generate_password_hash(
                 data['password'], method='sha256')
