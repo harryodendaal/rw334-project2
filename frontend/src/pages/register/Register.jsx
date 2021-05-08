@@ -17,7 +17,7 @@ export const Register = ({ changeToken }) => {
   return (
     <div className={styled.container}>
       <div className={styled.border}>
-        <h1>Register</h1>
+        <h2>Register</h2>
         <Formik
           validationSchema={regValidation}
           initialValues={{ username: "", password: "" }}
@@ -36,7 +36,7 @@ export const Register = ({ changeToken }) => {
               })
               .catch((e) => {
                 console.log(e);
-                alert(e);
+                alert(e.response.data['message']);
               });
           }}
         >
@@ -50,6 +50,9 @@ export const Register = ({ changeToken }) => {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit}>
+              <p>
+                Username:
+              </p>
               <input
                 className={styled.input}
                 type="text"
@@ -59,6 +62,9 @@ export const Register = ({ changeToken }) => {
                 value={values.username}
               />
               {values.username && touched.username && errors.username}
+              <p>
+                Password:
+              </p>
               <input
                 className={styled.input}
                 type="password"
