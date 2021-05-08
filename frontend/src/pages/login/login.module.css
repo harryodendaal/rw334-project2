@@ -3,6 +3,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: 20px;
+}
+
+b {
+    margin-right: 150px;
+    font-family: "Lucida Console", monospace;
+    text-align: left;
+    color: rgb(24, 27, 122);
 }
 
 .input {
@@ -10,5 +18,12 @@
 }
 
 .border {
-    border: solid 2px black
+    border: outset 10px
+}
+
+h2 {
+    margin-left: 10px;
+    font-family: "Lucida Console", monospace;
+    color: rgb(24, 27, 122);
+    font-size: xx-large;
 }
