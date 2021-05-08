@@ -1,5 +1,4 @@
 import React from 'react';
-import image from './logo1.jpg';
 import styled from './home.module.css';
 
 import rutger from './Rutger.jpeg'
