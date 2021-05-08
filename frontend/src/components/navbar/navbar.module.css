@@ -3,12 +3,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: aqua;
+  background-color: #f1f1f1;
+  margin-top: -8px;
+  margin-left: -8px;
+  width: 1900px;
+}
+
+a {
+  color: rgb(24, 27, 122);
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  font-family: "Lucida Console", monospace;
+  text-align: left;
 }
 
 li {
   display: inline;
-  color: black;
   list-style: none;
-  margin: 10px;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+li:hover {
+  background-color: #ccc;
+  color: rgb(255, 255, 255);
 }
