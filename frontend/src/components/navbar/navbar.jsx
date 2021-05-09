@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 import styled from "./navbar.module.css";
 
 // woot not working when i say unAuthnticatedLinks o well ../
@@ -21,9 +22,16 @@ import styled from "./navbar.module.css";
 // };
 const AuthenticatedLinks = ({ changeToken }) => {
   const handleClick = () => {
+    axiosInstance
+      .post("logout")
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     changeToken();
     localStorage.removeItem("token");
-    // changeToken();
     console.log("hello");
   };
 

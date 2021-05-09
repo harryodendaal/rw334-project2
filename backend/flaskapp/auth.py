@@ -10,6 +10,7 @@ import re
 
 auth = Blueprint('auth', __name__)
 
+
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
@@ -22,22 +23,21 @@ def token_required(func):
             "SECRET_KEY"), algorithms='HS256')
 
         try:
-            current_user:User = User.query.filter_by(id=data['sub']).first()
+            current_user: User = User.query.filter_by(id=data['sub']).first()
             is_white_listed_token = current_user.decode_auth_token(token)
 
             if is_white_listed_token == 'Token is not in whitelistedToken table':
-                return jsonify({"message":"Token is not whitelisted"}), 401
+                return jsonify({"message": "Token is not whitelisted"}), 401
         except:
             return jsonify({'message': 'Token is invalid!'}), 401
 
-        
         return func(current_user, *args, **kwargs)
     return decorated
 
 
-@auth.route('/hello', methods=['POST', 'GET'])
-def hello():
-    return {"message": "hello"}
+# @auth.route('/hello', methods=['POST', 'GET'])
+# def hello():
+#     return {"message": "hello"}
 
 
 @auth.route('/register', methods=['POST'])
@@ -47,14 +47,14 @@ def register():
     # check if user already exists
     user = User.query.filter_by(username=data.get('email')).first()
     if not user:
-        reg = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+        reg = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{12,}$"
         password = data['password']
+
         pattern = re.compile(reg)
         match = re.search(pattern, password)
-        print(match)
 
         if not match:
-            return make_response({"message":"password is invalid"}),401 
+            return make_response({"message": "password should have uppercase, lowercase, digit and special character"}), 401
         try:
             hashed_password = generate_password_hash(
                 data['password'], method='sha256')
@@ -134,7 +134,7 @@ def logout(current_user):
         resp = User.decode_auth_token(auth_token)
         if not isinstance(resp, str):
             try:
-                #also have to remove the whitelisted token from database
+                # also have to remove the whitelisted token from database
                 WhiteListToken.query.filter_by(token=auth_token).delete()
                 db.session.commit()
                 responseObject = {
@@ -159,9 +159,9 @@ def logout(current_user):
         return make_response(jsonify(responseObject)), 403
 
 
-@auth.route('/secure', methods=['GET'])
-@token_required
-def secure(current_user):
-    return jsonify({"message": "Success"})
+# @auth.route('/secure', methods=['GET'])
+# @token_required
+# def secure(current_user):
+#     return jsonify({"message": "Success"})
 
 # supersecret needs to be enviorment variable
