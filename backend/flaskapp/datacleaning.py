@@ -1,8 +1,10 @@
 import pandas as pd
+from pandas.core import indexing
 import numpy as np
 import re
+from datetime import datetime
 
-
+print('Starting datacleaning.py')
 #import emails
 filename = 'emails.csv'
 df = pd.DataFrame()
@@ -15,10 +17,11 @@ for tp in pd.read_csv(filename, chunksize = 25000, converters={'message': auto_t
     tp = tp.loc[~tp['file'].str.contains("sent_mail|all_documents/|discussion_threads/")].dropna()
     df = df.append(tp)
 df = df.reset_index(drop=True)
-
+print('Finished import')
 
 #get fields
 data = []
+drop = []
 keys = ['Date', 'X-From', 'X-To', 'Subject', 'X-cc', 'X-bcc', 'Message-ID','dupmessage']
 row = dict.fromkeys(keys)
 for x in range(len(df)):
@@ -27,7 +30,10 @@ for x in range(len(df)):
     result = re.sub('\n ', ' ', result)
     i = result.find('X-FileName')
     k = result.find('\n',i)
-    body = result[k+2:]
+    body = result[k+2:].strip()
+    if body == '':
+        drop.append(x)
+        continue
     result = result[:i-1]
     result = re.split('\n', result)
     value = [s[s.find(': ')+2:] for s in result]
@@ -39,16 +45,21 @@ for x in range(len(df)):
     elif row['Subject']: dup = dup + row['Subject']
     dup = dup+body
     row['dupmessage'] = dup
-    row['Message-ID'] = row['Message-ID'][1:-1]
+    mid = row['Message-ID']
+    m = mid.find('Java')
+    row['Message-ID'] = row['Message-ID'][1:m-1]
     values = list(row.values())[:8]
     values.insert(0, body)
     data.append(values)
+df = df.drop(df.index[drop])
 df = df.drop('message',1)
 df = pd.concat([df, pd.DataFrame.from_records(data)], axis=1)
 
 df.columns = ['file','body','Date', 'X-From', 'X-To', 'Subject', 'X-cc', 'X-bcc', 'Message-ID', 'dupmessage']
 df = df.drop_duplicates(subset='dupmessage', keep="last") #delete duplicate emails (Same from, to, subject, body)
 df = df.drop('dupmessage', 1)
+
+print('Removed Duplicates')
 
 def file_to_email():
     valid = set()
@@ -201,11 +212,14 @@ def sep_name(all_name):
     #print(listofnames)
     return list(listofnames)
 
+print('Converting data to tables...')
+
 email_reg = r"^[a-z]+\-[\da-z-]+@enron.com$"
 valid_email = file_to_email()
 employ = []
 mess = []
 rec =[]
+tofromccbcc = []
 undisclosed = 'undisclosed-recepients@enron.com'
 no_ad = [None, None, 'no.address@enron.com']
 employ.append(no_ad)
@@ -225,7 +239,6 @@ for x in range(len(df)):
     else:
         from_mail = 'no.address@enron.com'
     row[3] = from_mail
-    
     xto = str(row[4])
     if xto == '':
         row[4] = [undisclosed]
@@ -277,26 +290,32 @@ for x in range(len(df)):
             rec.append(recipient)
     
     mess.append(messagetab)
-    df.iloc[x] = np.array(row, dtype=object)
+    if x == int(len(df)/2):
+        print('(Halfway there)')
 
+del df
+print('***Creating .csv files***')
 #EmployeeList
 employdf = pd.DataFrame(employ)
-employdf = employdf.drop_duplicates(2, keep = 'first') #removes dup emails
-employdf = employdf.sort_values(2)
+employdf.columns = ['firstname', 'lastname', 'Email_id']
+employdf.index.name = 'eid'
+employdf = employdf.drop_duplicates('Email_id', keep = 'first') #removes dup emails
+employdf = employdf.sort_values('Email_id')
 employdf = employdf.reset_index(drop=True)
-employdf.to_csv('EmployeeList.csv')
-
+employdf.to_csv('EmployeeList.csv',index=True)
+print('Created EmployeeList.csv')
 #Message
 msgdf = pd.DataFrame(mess)
+msgdf.columns = ['sender', 'date', 'message_id', 'subject', 'body', 'folder']
+msgdf.index.name = 'mid'
 msgdf = msgdf.reset_index(drop=True)
-msgdf.to_csv('Message.csv')
-
+msgdf.to_csv('Message.csv', index=True)
+print('Created Message.csv')
 #RecipientInfo
 recdf = pd.DataFrame(rec)
 recdf = recdf.reset_index(drop=True)
-recdf.to_csv('RecipientInfo.csv', index=False)
-
-#CSV with all from, to, cc and bcc
-emails = df.copy()
-email = df.drop(['file','body','Date','Subject','Message-ID'], axis =1)
-email.to_csv('FromToCcBcc.csv', index=False)
+recdf.columns = ['mid', 'rtype','rvalue']
+recdf.index.name = 'rid'
+recdf.to_csv('RecipientInfo.csv', index=True)
+print('Created RecipientInfo.csv')
+print('Done!')
