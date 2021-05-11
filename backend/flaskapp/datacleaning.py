@@ -1,10 +1,11 @@
+print('Starting datacleaning.py')
 import pandas as pd
 from pandas.core import indexing
 import numpy as np
 import re
 from datetime import datetime
 
-print('Starting datacleaning.py')
+
 #import emails
 filename = 'emails.csv'
 df = pd.DataFrame()
@@ -48,6 +49,15 @@ for x in range(len(df)):
     mid = row['Message-ID']
     m = mid.find('Java')
     row['Message-ID'] = row['Message-ID'][1:m-1]
+    msgdate = row['Date']
+    m = msgdate.rfind('-')
+    msgdate = msgdate[:m-1].strip()
+    try:
+        msgdate = datetime.strptime(msgdate, '%a, %d %b %Y %H:%M:%S')
+    except:
+        msgdate = 'Fri, 9 Mar 2001 11:15:36'
+        msgdate = datetime.strptime(msgdate, '%a, %d %b %Y %H:%M:%S')
+    row['Date'] = msgdate
     values = list(row.values())[:8]
     values.insert(0, body)
     data.append(values)
@@ -64,7 +74,9 @@ print('Removed Duplicates')
 def file_to_email():
     valid = set()
     valid.add('no.address@enron.com')
+
     for file in df['file']:
+        #print(file)
         i = file.find('/')
         #if statements are for spelling inconsistentcies in the csv
         if file[:i] == 'crandell-s':
@@ -293,22 +305,21 @@ for x in range(len(df)):
     if x == int(len(df)/2):
         print('(Halfway there)')
 
-del df
 print('***Creating .csv files***')
 #EmployeeList
 employdf = pd.DataFrame(employ)
 employdf.columns = ['firstname', 'lastname', 'Email_id']
-employdf.index.name = 'eid'
 employdf = employdf.drop_duplicates('Email_id', keep = 'first') #removes dup emails
 employdf = employdf.sort_values('Email_id')
 employdf = employdf.reset_index(drop=True)
+employdf.index.name = 'eid'
 employdf.to_csv('EmployeeList.csv',index=True)
 print('Created EmployeeList.csv')
 #Message
 msgdf = pd.DataFrame(mess)
 msgdf.columns = ['sender', 'date', 'message_id', 'subject', 'body', 'folder']
-msgdf.index.name = 'mid'
 msgdf = msgdf.reset_index(drop=True)
+msgdf.index.name = 'mid'
 msgdf.to_csv('Message.csv', index=True)
 print('Created Message.csv')
 #RecipientInfo
