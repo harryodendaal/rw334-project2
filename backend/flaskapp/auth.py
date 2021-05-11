@@ -15,7 +15,9 @@ def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
         token = None
+        print(request.headers)
         if 'x-access-token' in request.headers:
+            print("hello")
             token = request.headers['x-access-token']
         if not token:
             return jsonify({"message": "Token is missing!"}), 401
@@ -159,9 +161,9 @@ def logout(current_user):
         return make_response(jsonify(responseObject)), 403
 
 
-# @auth.route('/secure', methods=['GET'])
-# @token_required
-# def secure(current_user):
-#     return jsonify({"message": "Success"})
+@auth.route('/secure', methods=['GET'])
+@token_required
+def secure(current_user):
+    return jsonify({"message": "Success"})
 
 # supersecret needs to be enviorment variable
