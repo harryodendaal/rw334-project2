@@ -31,7 +31,7 @@ for x in range(len(df)):
     result = re.sub('\n ', ' ', result)
     i = result.find('X-FileName')
     k = result.find('\n',i)
-    body = result[k+2:].strip()
+    body = result[k+2:].strip().replace('\"', '')
     if body == '':
         drop.append(x)
         continue
@@ -41,6 +41,7 @@ for x in range(len(df)):
     key = [s[:s.find(': ')] for s in result]
     temp = dict(zip(key, value))
     row.update(temp)
+    row['Subject']  = row['Subject'].replace('\"', '')
     dup = row['X-From']
     if row['X-To']: dup = dup + row['X-To']
     elif row['Subject']: dup = dup + row['Subject']
@@ -319,6 +320,7 @@ print('Created EmployeeList.csv')
 msgdf = pd.DataFrame(mess)
 msgdf.columns = ['sender', 'date', 'message_id', 'subject', 'body', 'folder']
 msgdf = msgdf.reset_index(drop=True)
+msgdf = msgdf.drop('body', 1) ##%% comment line to include body column
 msgdf.index.name = 'mid'
 msgdf.to_csv('Message.csv', index=True)
 print('Created Message.csv')
