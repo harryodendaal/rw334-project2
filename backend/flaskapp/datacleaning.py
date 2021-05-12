@@ -4,7 +4,7 @@ from pandas.core import indexing
 import numpy as np
 import re
 from datetime import datetime
-
+import csv
 
 #import emails
 filename = 'emails.csv'
@@ -278,14 +278,18 @@ for x in range(len(df)):
         xbcc = xbcc.replace('\n', '')
         bcc_names  = sep_name(xbcc)
     row[7] = bcc_names
-    to_check = len(row[4]) == 1 and row[4][0] == undisclosed
-    cc_check = row[6] is None
-    if not cc_check: cc_check = len(row[6]) == 1 and row[6][0] == undisclosed
-    bcc_check = row[7] is None
-    if not bcc_check: bcc_check = len(row[7]) == 1 and row[7][0] == undisclosed
     file = row[0]
     i = file.find('/')
     file = file[:i]+'@enron.com'
+    to_check = len(row[4]) == 1 and row[4][0] == undisclosed
+    cc_check = row[6] is None
+    if not cc_check: cc_check = file not in row[6]
+    bcc_check = row[7] is None
+    if not bcc_check: bcc_check = file not in row[7]
+    if ',' in  row[5]:
+        row[5] = row[5].replace(',','')
+
+
     if from_mail != file and to_check and cc_check and bcc_check:
         row[4] = [file]
     # message table info
@@ -314,7 +318,7 @@ employdf = employdf.drop_duplicates('Email_id', keep = 'first') #removes dup ema
 employdf = employdf.sort_values('Email_id')
 employdf = employdf.reset_index(drop=True)
 employdf.index.name = 'eid'
-employdf.to_csv('EmployeeList.csv',index=True)
+employdf.to_csv('EmployeeList.csv',index=True, quoting=csv.QUOTE_NONE)
 print('Created EmployeeList.csv')
 #Message
 msgdf = pd.DataFrame(mess)
@@ -322,13 +326,13 @@ msgdf.columns = ['sender', 'date', 'message_id', 'subject', 'body', 'folder']
 msgdf = msgdf.reset_index(drop=True)
 msgdf = msgdf.drop('body', 1) ##%% comment line to include body column
 msgdf.index.name = 'mid'
-msgdf.to_csv('Message.csv', index=True)
+msgdf.to_csv('Message.csv', index=True, quoting=csv.QUOTE_NONE)
 print('Created Message.csv')
 #RecipientInfo
 recdf = pd.DataFrame(rec)
 recdf = recdf.reset_index(drop=True)
 recdf.columns = ['mid', 'rtype','rvalue']
 recdf.index.name = 'rid'
-recdf.to_csv('RecipientInfo.csv', index=True)
+recdf.to_csv('RecipientInfo.csv', index=True, quoting=csv.QUOTE_NONE)
 print('Created RecipientInfo.csv')
 print('Done!')
