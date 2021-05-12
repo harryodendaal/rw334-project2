@@ -1,10 +1,11 @@
+print('Starting datacleaning.py')
 import pandas as pd
 from pandas.core import indexing
 import numpy as np
 import re
 from datetime import datetime
+import csv
 
-print('Starting datacleaning.py')
 #import emails
 filename = 'emails.csv'
 df = pd.DataFrame()
@@ -30,7 +31,7 @@ for x in range(len(df)):
     result = re.sub('\n ', ' ', result)
     i = result.find('X-FileName')
     k = result.find('\n',i)
-    body = result[k+2:].strip()
+    body = result[k+2:].strip().replace('\"', '')
     if body == '':
         drop.append(x)
         continue
@@ -40,6 +41,7 @@ for x in range(len(df)):
     key = [s[:s.find(': ')] for s in result]
     temp = dict(zip(key, value))
     row.update(temp)
+    row['Subject']  = row['Subject'].replace('\"', '')
     dup = row['X-From']
     if row['X-To']: dup = dup + row['X-To']
     elif row['Subject']: dup = dup + row['Subject']
@@ -48,6 +50,15 @@ for x in range(len(df)):
     mid = row['Message-ID']
     m = mid.find('Java')
     row['Message-ID'] = row['Message-ID'][1:m-1]
+    msgdate = row['Date']
+    m = msgdate.rfind('-')
+    msgdate = msgdate[:m-1].strip()
+    try:
+        msgdate = datetime.strptime(msgdate, '%a, %d %b %Y %H:%M:%S')
+    except:
+        msgdate = 'Fri, 9 Mar 2001 11:15:36'
+        msgdate = datetime.strptime(msgdate, '%a, %d %b %Y %H:%M:%S')
+    row['Date'] = msgdate
     values = list(row.values())[:8]
     values.insert(0, body)
     data.append(values)
@@ -64,7 +75,9 @@ print('Removed Duplicates')
 def file_to_email():
     valid = set()
     valid.add('no.address@enron.com')
+
     for file in df['file']:
+        #print(file)
         i = file.find('/')
         #if statements are for spelling inconsistentcies in the csv
         if file[:i] == 'crandell-s':
@@ -265,14 +278,18 @@ for x in range(len(df)):
         xbcc = xbcc.replace('\n', '')
         bcc_names  = sep_name(xbcc)
     row[7] = bcc_names
-    to_check = len(row[4]) == 1 and row[4][0] == undisclosed
-    cc_check = row[6] is None
-    if not cc_check: cc_check = len(row[6]) == 1 and row[6][0] == undisclosed
-    bcc_check = row[7] is None
-    if not bcc_check: bcc_check = len(row[7]) == 1 and row[7][0] == undisclosed
     file = row[0]
     i = file.find('/')
     file = file[:i]+'@enron.com'
+    to_check = len(row[4]) == 1 and row[4][0] == undisclosed
+    cc_check = row[6] is None
+    if not cc_check: cc_check = file not in row[6]
+    bcc_check = row[7] is None
+    if not bcc_check: bcc_check = file not in row[7]
+    if ',' in  row[5]:
+        row[5] = row[5].replace(',','')
+
+
     if from_mail != file and to_check and cc_check and bcc_check:
         row[4] = [file]
     # message table info
@@ -293,29 +310,29 @@ for x in range(len(df)):
     if x == int(len(df)/2):
         print('(Halfway there)')
 
-del df
 print('***Creating .csv files***')
 #EmployeeList
 employdf = pd.DataFrame(employ)
 employdf.columns = ['firstname', 'lastname', 'Email_id']
-employdf.index.name = 'eid'
 employdf = employdf.drop_duplicates('Email_id', keep = 'first') #removes dup emails
 employdf = employdf.sort_values('Email_id')
 employdf = employdf.reset_index(drop=True)
-employdf.to_csv('EmployeeList.csv',index=True)
+employdf.index.name = 'eid'
+employdf.to_csv('EmployeeList.csv',index=True, quoting=csv.QUOTE_NONE)
 print('Created EmployeeList.csv')
 #Message
 msgdf = pd.DataFrame(mess)
 msgdf.columns = ['sender', 'date', 'message_id', 'subject', 'body', 'folder']
-msgdf.index.name = 'mid'
 msgdf = msgdf.reset_index(drop=True)
-msgdf.to_csv('Message.csv', index=True)
+msgdf = msgdf.drop('body', 1) ##%% comment line to include body column
+msgdf.index.name = 'mid'
+msgdf.to_csv('Message.csv', index=True, quoting=csv.QUOTE_NONE)
 print('Created Message.csv')
 #RecipientInfo
 recdf = pd.DataFrame(rec)
 recdf = recdf.reset_index(drop=True)
 recdf.columns = ['mid', 'rtype','rvalue']
 recdf.index.name = 'rid'
-recdf.to_csv('RecipientInfo.csv', index=True)
+recdf.to_csv('RecipientInfo.csv', index=True, quoting=csv.QUOTE_NONE)
 print('Created RecipientInfo.csv')
 print('Done!')
