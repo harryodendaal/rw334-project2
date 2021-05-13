@@ -44,6 +44,9 @@ const AuthenticatedLinks = ({ changeToken }) => {
         <Link to="/graphs">Graphs</Link>
       </li>
       <li>
+        <Link to="/employees">Employees</Link>
+      </li>
+      <li>
         <a href="/" onClick={handleClick}>
           Logout
         </a>

@@ -14,10 +14,9 @@ auth = Blueprint('auth', __name__)
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
+        print('hello')
         token = None
-        print(request.headers)
         if 'x-access-token' in request.headers:
-            print("hello")
             token = request.headers['x-access-token']
         if not token:
             return jsonify({"message": "Token is missing!"}), 401
