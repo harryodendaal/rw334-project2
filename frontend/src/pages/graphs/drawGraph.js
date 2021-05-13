@@ -136,9 +136,9 @@ export const drawGraph = (data, visType) => {
               }
               // Centrality
               if(visType === 'centrality') {
-                let color = (d.score / 8) * 255;
+                let color = (d.score - 1.2 / (4.34 - 1.2)) * 255;
                 let color2 = 255 - color;
-                return 'rgb(' + color + ', ' + color2 + ', 0)';
+                return 'rgb(' + color + ',0 ,' + color2 + ')';
               }
               // Label propagation
               if(visType === 'label-propagation') {
