@@ -94,8 +94,7 @@ class GraphVisualization:
         for record in result_1:
             communities[str(record['nodeId'])] = record['communityId']
 
-        result_2 = tx.run("MATCH (e1:Employee)-[r:EMAILS]->(e2:Employee) "
-                        "WHERE (e1)-[:SENT]->(e2) AND (e2)-[:SENT]->(e1) AND r.amount > 4 "
+        result_2 = tx.run("MATCH (e1:Employee)-[r:SENT]->(e2:Employee) "
                         "RETURN e1, e2, r ")
         nodes = []
         links = []
@@ -130,7 +129,7 @@ class GraphVisualization:
     @staticmethod
     def _shortest_path(tx):
         result_1 = tx.run(
-                        "MATCH (e1:Employee {emailaddress: \"mary.clark@enron.com\"}), (e2:Employee {emailaddress: \"roberto.martinez@enron.com\"}) "
+                        "MATCH (e1:Employee {emailaddress: \"linder-e@enron.com\"}), (e2:Employee {emailaddress: \"brawner-s@enron.com\"}) "
                         "CALL gds.beta.shortestPath.dijkstra.stream({ "
                         "nodeQuery: 'MATCH (e:Employee) RETURN id(e) as id', "
                         "relationshipQuery: 'MATCH (e3:Employee)-[r:BI]-(e4:Employee) WHERE r.amount > 4 RETURN id(e3) as source, id(e4) as target, r.amount as weight', "
@@ -146,8 +145,7 @@ class GraphVisualization:
             for node_id in record['node_Ids']:
                 path_nodes.append(node_id)
 
-        result_2 = tx.run("MATCH (e1:Employee)-[r:BI]->(e2:Employee) "
-                        "WHERE r.amount > 4 "
+        result_2 = tx.run("MATCH (e1:Employee)-[r:SENT]->(e2:Employee) "
                         "RETURN e1, e2, r ")
         nodes = []
         links = []
@@ -195,8 +193,7 @@ class GraphVisualization:
         for record in result_1:
             node_scores[str(record['id'])] = record['score']
 
-        result_2 = tx.run("MATCH (e1:Employee)-[r:EMAILS]->(e2:Employee) "
-                        "WHERE (e1)-[:SENT]->(e2) AND (e2)-[:SENT]->(e1) AND r.amount > 4 "
+        result_2 = tx.run("MATCH (e1:Employee)-[r:SENT]->(e2:Employee) "
                         "RETURN e1, e2, r ")
         nodes = []
         links = []
