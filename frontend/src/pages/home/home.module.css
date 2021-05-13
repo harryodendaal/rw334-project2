@@ -1,33 +1,53 @@
-img{
-    width: 300px;
-    height: 300px;
+img {
+  width: 300px;
+  height: 300px;
 }
 
-.border{
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    border-left-width: 72px;
-    border-right-width: 72px;
-    width: page;
-    height: 150px;
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.border {
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  border-left-width: 72px;
+  border-right-width: 72px;
+  width: page;
+  height: 150px;
 
-    font-family: "Lucida Console", monospace;
-    text-align: left;
-    color: rgb(24, 27, 122);
+  font-family: "Lucida Console", monospace;
+  text-align: left;
+  color: rgb(24, 27, 122);
 }
 
 .column {
-    float: left;
-    width: 33.3%;
-    margin-bottom: 16px;
-    padding: 0 8px;
+  float: left;
+  width: 33.3%;
+  margin-bottom: 16px;
+  padding: 0 8px;
 }
 
-.group{
-    margin-top: 130px;
+.group {
+  margin-top: 130px;
 }
 
-h1{
-    font-size: 50px;
+h1 {
+  font-size: 50px;
+}
+
+@media only screen and (max-width: 1200px) {
+  /*Tablets [601px -> 1200px]*/
+}
+@media only screen and (max-width: 1050px) {
+  .container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media only screen and (max-width: 725px) {
+  .container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
 }

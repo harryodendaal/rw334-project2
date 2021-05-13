@@ -6,8 +6,8 @@ from . import config
 graphs = Blueprint('graphs', __name__)
 
 
-@token_required
 @graphs.route('/')
+@token_required
 def graphs_home():
     graph = GraphVisualization(config.NEO4J_URL, config.NEO4J_USERNAME, config.NEO4J_PASSWORD)
     data = graph.call_d3()
@@ -16,8 +16,8 @@ def graphs_home():
     return jsonify(data)
 
 
-@token_required
 @graphs.route('/shortest-path')
+@token_required
 def graphs_shortest_path():
     graph = GraphVisualization(config.NEO4J_URL, config.NEO4J_USERNAME, config.NEO4J_PASSWORD)
     data = graph.call_shortest_path()
@@ -25,8 +25,8 @@ def graphs_shortest_path():
     return jsonify(data)
 
 
-@token_required
 @graphs.route('/label-propagation')
+@token_required
 def graphs_label_propagation():
     graph = GraphVisualization(config.NEO4J_URL, config.NEO4J_USERNAME, config.NEO4J_PASSWORD)
     data = graph.call_label_propagation()
@@ -34,8 +34,8 @@ def graphs_label_propagation():
     return jsonify(data)
 
 
-@token_required
 @graphs.route('/centrality')
+@token_required
 def graphs_centrality():
     graph = GraphVisualization(config.NEO4J_URL, config.NEO4J_USERNAME, config.NEO4J_PASSWORD)
     data = graph.call_centrality()

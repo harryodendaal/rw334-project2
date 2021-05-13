@@ -313,9 +313,9 @@ for x in range(len(df)):
 print('***Creating .csv files***')
 #EmployeeList
 employdf = pd.DataFrame(employ)
-employdf.columns = ['firstname', 'lastname', 'Email_id']
-employdf = employdf.drop_duplicates('Email_id', keep = 'first') #removes dup emails
-employdf = employdf.sort_values('Email_id')
+employdf.columns = ['firstname', 'lastname', 'email_id']
+employdf = employdf.drop_duplicates('email_id', keep = 'first') #removes dup emails
+employdf = employdf.sort_values('email_id')
 employdf = employdf.reset_index(drop=True)
 employdf.index.name = 'eid'
 employdf.to_csv('EmployeeList.csv',index=True, quoting=csv.QUOTE_NONE)

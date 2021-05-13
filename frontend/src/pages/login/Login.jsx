@@ -38,7 +38,7 @@ export const Login = ({ changeToken }) => {
               })
               .catch((e) => {
                 console.log(e);
-                alert(e.response.data['message']);
+                alert(e.response.data["message"]);
               });
           }}
         >

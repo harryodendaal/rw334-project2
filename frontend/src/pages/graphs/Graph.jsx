@@ -4,14 +4,13 @@ import * as d3 from 'd3'
 import {drawGraph} from './drawGraph'
 
 export const Graph = (props) => {
-
   useEffect(() => {
     
   }, );
 
   const zoomStyles = {
-    overflow: 'hidden'
-  }
+    overflow: "hidden",
+  };
 
   return (
     <div>
@@ -19,5 +18,5 @@ export const Graph = (props) => {
       <div className="viz"><svg width="1100" height="700"></svg></div>
       </div>
     </div>
-  )
-}
+  );
+};

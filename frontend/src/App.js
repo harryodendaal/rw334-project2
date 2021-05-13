@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Route, BrowserRouter as Router} from 'react-router-dom'
-import {home,Login,Register,Graphs } from './pages/index';
+import {home,Login,Register,Graphs, Employees } from './pages/index';
 import {Navbar} from './components/index'
 
 import "./App.css"
@@ -28,6 +28,9 @@ function App() {
       </Route>
       <Route exact path='/register'>
         <Register changeToken={changeTokenState}/>
+      </Route>
+      <Route exact path ='/employees'>
+        <Employees/>
       </Route>
     </Router>
   );

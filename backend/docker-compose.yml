@@ -21,6 +21,13 @@ services:
       - 5432:5432  
     volumes:
       - db_volume:/var/lib/postgresql
+  graph_database:
+    container_name: neo4j
+    image: neo4j:latest
+    ports: 
+      - "7474:7474"
+      - "7687:7687"
+    
 
 volumes:
   db_volume:

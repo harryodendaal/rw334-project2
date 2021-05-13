@@ -10,6 +10,9 @@ const regValidation = Yup.object().shape({
   password: Yup.string()
     .required("Password is required")
     .min(12, "password needs to be atleast 12 characters long"),
+  passwordConfirmation: Yup.string()
+    .required("Password is required")
+    .min(12, "password needs to be atleast 12 characters long"),
 });
 
 export const Register = ({ changeToken }) => {
@@ -20,24 +23,32 @@ export const Register = ({ changeToken }) => {
         <h2>Register</h2>
         <Formik
           validationSchema={regValidation}
-          initialValues={{ username: "", password: "" }}
+          initialValues={{
+            username: "",
+            password: "",
+            passwordConfirmation: "",
+          }}
           onSubmit={(values) => {
-            console.log(values);
-            axiosInstance
-              .post("register", {
-                username: values.username,
-                password: values.password,
-              })
-              .then((res) => {
-                console.log(res);
-                localStorage.setItem("token", res.data["access_token"]);
-                history.push("/");
-                changeToken();
-              })
-              .catch((e) => {
-                console.log(e);
-                alert(e.response.data['message']);
-              });
+            console.log(values.passwordConfirmation);
+            if (values.password === values.passwordConfirmation) {
+              axiosInstance
+                .post("register", {
+                  username: values.username,
+                  password: values.password,
+                })
+                .then((res) => {
+                  console.log(res);
+                  localStorage.setItem("token", res.data["access_token"]);
+                  history.push("/");
+                  changeToken();
+                })
+                .catch((e) => {
+                  console.log(e);
+                  alert(e.response.data["message"]);
+                });
+            } else {
+              alert("passwords do not match");
+            }
           }}
         >
           {({
@@ -50,9 +61,7 @@ export const Register = ({ changeToken }) => {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit}>
-              <p>
-                Username:
-              </p>
+              <p>Username:</p>
               <input
                 className={styled.input}
                 type="text"
@@ -62,9 +71,7 @@ export const Register = ({ changeToken }) => {
                 value={values.username}
               />
               {values.username && touched.username && errors.username}
-              <p>
-                Password:
-              </p>
+              <p>Password:</p>
               <input
                 className={styled.input}
                 type="password"
@@ -73,10 +80,21 @@ export const Register = ({ changeToken }) => {
                 onBlur={handleBlur}
                 value={values.password}
               />
+              <br></br>
               {errors.password && touched.password && errors.password}
-              <button type="submit" disabled={isSubmitting}>
-                Submit
-              </button>
+              <p>Password Confirmation:</p>
+              <input
+                className={styled.input}
+                type="password"
+                name="passwordConfirmation"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.passwordConfirmation}
+              />
+              <br></br>
+              {errors.passwordConfirmation && touched.passwordConfirmation}
+
+              <button type="submit">Submit</button>
             </form>
           )}
         </Formik>

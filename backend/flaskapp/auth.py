@@ -14,6 +14,7 @@ auth = Blueprint('auth', __name__)
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
+        print('hello')
         token = None
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
@@ -159,9 +160,9 @@ def logout(current_user):
         return make_response(jsonify(responseObject)), 403
 
 
-# @auth.route('/secure', methods=['GET'])
-# @token_required
-# def secure(current_user):
-#     return jsonify({"message": "Success"})
+@auth.route('/secure', methods=['GET'])
+@token_required
+def secure(current_user):
+    return jsonify({"message": "Success"})
 
 # supersecret needs to be enviorment variable
