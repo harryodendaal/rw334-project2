@@ -29,8 +29,8 @@ function App() {
       <Route exact path='/register'>
         <Register changeToken={changeTokenState}/>
       </Route>
-      <Route>
-        <Employees exact path='/employees'/>
+      <Route exact path ='/employees'>
+        <Employees/>
       </Route>
     </Router>
   );
