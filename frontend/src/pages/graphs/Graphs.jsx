@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-// import {Graph} from './Graph'
 import {Loader} from './Loader'
 
 import styled from './Graph.module.css'
