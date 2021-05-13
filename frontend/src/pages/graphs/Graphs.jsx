@@ -12,7 +12,12 @@ export const Graphs = () => {
 
   useEffect(() => {
     axios
-    .get('http://127.0.0.1:5000/graphs/', {timeout: 28000})
+    .get('http://127.0.0.1:5000/graphs/', {
+      headers: {
+        "x-access-token": localStorage.getItem("token"),
+      },
+      timeout: 28000,
+    })
     .then((res) => {
       // Loader equal to false... 
       setLoading(false);
@@ -45,7 +50,12 @@ export const Graphs = () => {
     setLoading(true);
 
     axios
-    .get(apiLink, {timeout: 28000})
+    .get(apiLink, {
+      headers: {
+        "x-access-token": localStorage.getItem("token"),
+      },
+      timeout: 28000,
+    })
     .then((res) => {
       // Loader equal to false... 
       setLoading(false);
