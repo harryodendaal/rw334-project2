@@ -55,12 +55,14 @@ class GraphVisualization:
         for record in result:
             node_1 = {
                 'id': record['e1']._id,
-                # 'firstname': record['e1']._properties['firstname'],
+                'firstname': record['e1']._properties['firstname'],
+                'lastname': record['e1']._properties['lastname'],
                 'emailaddress': record['e1']._properties['emailaddress'],
             }
             node_2 = {
                 'id': record['e2']._id,
-                # 'firstname': record['e2']._properties['firstname'],
+                'firstname': record['e2']._properties['firstname'],
+                'lastname': record['e2']._properties['lastname'],
                 'emailaddress': record['e2']._properties['emailaddress'],
             }
             link = {
@@ -129,7 +131,7 @@ class GraphVisualization:
     @staticmethod
     def _shortest_path(tx):
         result_1 = tx.run(
-                        "MATCH (e1:Employee {emailaddress: \"linder-e@enron.com\"}), (e2:Employee {emailaddress: \"brawner-s@enron.com\"}) "
+                        "MATCH (e1:Employee {emailaddress: \"solberg-g@enron.com\"}), (e2:Employee {emailaddress: \"lokey-t@enron.com\"}) "
                         "CALL gds.beta.shortestPath.dijkstra.stream({ "
                         "nodeQuery: 'MATCH (e:Employee) RETURN id(e) as id', "
                         "relationshipQuery: 'MATCH (e3:Employee)-[r:BI]-(e4:Employee) WHERE r.amount > 4 RETURN id(e3) as source, id(e4) as target, r.amount as weight', "
@@ -224,21 +226,5 @@ class GraphVisualization:
             'links': links,
         }
         return d3_dict  
-
-# if __name__ == "__main__":
-#     greeter = GraphVisualization("bolt://184.73.5.16:7687", "neo4j", "proportions-washers-terminations")
-#     d = greeter.call_d3()
-#     print(d)
-#     greeter.close()
-
-# from py2neo import Graph
-# graph = Graph("bolt://184.73.5.16:7687", auth=("neo4j", "proportions-washers-terminations"))
-
-# result = graph.run('MATCH(n) RETURN n;')
-# print(result)
-# tx = graph.begin()
-# for name in ["Alice", "Bob", "Carol"]:
-#     tx.append("CREATE (person:Person name: $name) RETURN person", name=name)
-# alice, bob, carol = [result.one for result in tx.commit()]
 
 
