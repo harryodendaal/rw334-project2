@@ -10,6 +10,7 @@ export const Employees = () => {
   const [loading, setLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState("");
   const [totalMessages, setTotalMessages] = useState("");
+
   function removeNull(array) {
     return array.filter((x) => x.firstname !== null);
   }
@@ -82,6 +83,7 @@ export const Employees = () => {
         }
       )
       .then((res) => {
+        setEmployeeData([]);
         setEmployeeData(res.data);
         setTotalMessages(res.data.reverse()[0]["totalMessages"]);
       })
@@ -118,7 +120,18 @@ export const Employees = () => {
         {employeeData === "" ? (
           <h1>No employe selected</h1>
         ) : (
-          <h1>Total messages sent: {totalMessages}</h1>
+          <div>
+            <h1>Total messages sent: {totalMessages}</h1>
+            <ul>
+              {employeeData.map((object, index) => {
+                return (
+                  <li key={index}>
+                    <p>{object.employee}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         )}
         <h2>All Employees:</h2>
         <div className={styled.employees}>
