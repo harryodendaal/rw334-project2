@@ -11,19 +11,19 @@ employees = Blueprint('employees', __name__)
 @token_required
 def get_all_employees(current_user):
     employees = Employee.query.all()
-    messages = Message.query.all()
-    print(messages)
-    i = 0
-    for m in messages:
-        # print(m)
-        db.session.delete(m)
-        if i % 20000 == 0:
-            print('20000 messages')
-            print(m)
-            db.session.commit()
-        i += 1
-    db.session.commit()
-    print(employees)
+    # messages = Message.query.all()
+    # print(messages)
+    # i = 0
+    # for m in messages:
+    #     # print(m)
+    #     db.session.delete(m)
+    #     if i % 20000 == 0:
+    #         print('20000 messages')
+    #         print(m)
+    #         db.session.commit()
+    #     i += 1
+    # db.session.commit()
+    # print(employees)
     all_employees: list = []
     for e in employees:
         all_employees.append({
