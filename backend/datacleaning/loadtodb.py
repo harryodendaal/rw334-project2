@@ -59,7 +59,7 @@ def csv_to_sql():
         dtype={
             "mid": Integer,
             "sender": VARCHAR(127),
-            "date": DATETIME,
+            "data": DATETIME,
             "message_id": VARCHAR(127),
             "subject": TEXT,
             "folder": VARCHAR(127),

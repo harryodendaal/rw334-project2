@@ -15,6 +15,7 @@ class Employee(db.Model):
     lastname = db.Column(db.String(31))
     email_id = db.Column(db.String(31))
 
+
 class Message(db.Model):
     def __init__(self, mid, sender, date, message_id, subject, folder):
         self.mid = mid
@@ -32,6 +33,7 @@ class Message(db.Model):
     subject = db.Column(db.Text)
     folder = db.Column(db.String(127))
 
+
 class Recipient(db.Model):
     def __init__(self, rid, mid, rtype, rvalue):
         self.rid = rid
@@ -44,7 +46,7 @@ class Recipient(db.Model):
     mid = db.Column(db.Integer)
     rtype = db.Column(db.String(30))
     rvalue = db.Column(db.String(127))
-    eid = db.Column(db.Integer, db.ForeignKey('employee_list.eid'),
-        nullable=True)
-    employee = db.relationship('Employee',
-        backref=db.backref('recipients', lazy=True))
+    # eid = db.Column(db.Integer, db.ForeignKey('employee_list.eid'),
+    #     nullable=True)
+    # employee = db.relationship('Employee',
+    #     backref=db.backref('recipients', lazy=True))

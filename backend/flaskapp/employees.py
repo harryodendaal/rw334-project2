@@ -1,7 +1,8 @@
 import json
 import csv
+
 from .auth import token_required
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from .database.models.enron import Employee, Recipient, Message
 from .database.models import db
 employees = Blueprint('employees', __name__)
@@ -20,6 +21,63 @@ def get_all_employees(current_user):
             "email_id": e.email_id
         })
     return json.dumps(all_employees), 200
+
+
+@employees.route('/get_employee_info', methods=['GET'])
+@token_required
+def get_employee_info(current_user):
+    print("the current user: ", current_user)
+    eid = request.get_json()['eid']
+
+    employee = Employee.query.filter_by(eid=eid).all()[0]
+    # number of emails sent in total
+
+    messages = Message.query.all()
+    mid_list: list = []
+    emails_sent: int = 0
+    for message in messages:
+        if message.sender == employee.email_id:
+            mid_list.append(message.mid)
+            emails_sent = emails_sent + 1
+
+    list_of_employee_dict = []
+    recipients = Recipient.query.all()
+    for r in recipients:
+        if r.mid in mid_list:
+            if r.rvalue.find('enron') != -1:
+                if len(list_of_employee_dict) == 0:
+                    list_of_employee_dict.append({
+                        "employee": r.rvalue,
+                        "messages_sent": 1
+                    })
+                elif not any(a['employee'] == r.rvalue for a in list_of_employee_dict):
+                    # does not exist
+                    list_of_employee_dict.append({
+                        'employee': r.rvalue,
+                        'messages_sent': 1
+                    })
+                else:
+                    # does exist
+                    # both methods take equally long so there was not reason to get fancy : []
+                    # method 1
+                    # d = next(
+                    #     item for item in list_of_employee_dict if item['employee'] == r.rvalue)
+                    # d['messages_sent'] += 1
+                    # methods 2
+                    for x in list_of_employee_dict:
+                        if x['employee'] == r.rvalue:
+                            x['messages_sent'] += 1
+
+    # now just need to extract the top 5
+    # i dont understand this code hav
+    newList = sorted(list_of_employee_dict,
+                     key=lambda k: k['messages_sent'], reverse=True)
+    if len(newList) > 5:
+        newnewlist = newList[:5]
+    else:
+        newnewlist = newList
+    newnewlist.append({"totalMessages": emails_sent})
+    return json.dumps(newnewlist), 200
 
     # query firstname
     # query lastname
@@ -53,6 +111,7 @@ def get_all_employees(current_user):
         j += 1
 
     return jsonify(top_5)
+
 
 
 @employees.route('/fillrelationships', methods=['GET'])
@@ -106,14 +165,12 @@ def create_data(current_user):
                     row[3],
                     row[4],
                     row[5],
-                    )
+                )
                 db.session.add(m)
                 if row_number % 10000 == 0:
                     db.session.commit()
                     print(m)
             row_number += 1
-
-
 
     with open('RecipientInfo.csv') as f:
         reader = csv.reader(f)
@@ -126,7 +183,7 @@ def create_data(current_user):
                     row[1],
                     row[2],
                     row[3],
-                    )
+                )
                 db.session.add(r)
                 if row_number % 10000 == 0:
                     db.session.commit()
