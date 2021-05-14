@@ -22,9 +22,9 @@ class GraphVisualization:
             data = session.write_transaction(self._label_propagation)
         return data
 
-    def call_shortest_path(self):
+    def call_shortest_path(self, source_email, target_email):
         with self.driver.session() as session:
-            data = session.write_transaction(self._shortest_path)
+            data = session.write_transaction(self._shortest_path, source_email, target_email)
         return data
 
     def call_centrality(self):
@@ -129,9 +129,16 @@ class GraphVisualization:
         return d3_dict  
 
     @staticmethod
-    def _shortest_path(tx):
+    def _shortest_path(tx, source_email, target_email):
+        # print(source_email)
+        source = '"solberg-g@enron.com"'
+        target = '"lokey-t@enron.com"'
+        if source_email:
+            source = f'"{source_email}"'
+        if target_email:
+            target = f'"{target_email}"'
         result_1 = tx.run(
-                        "MATCH (e1:Employee {emailaddress: \"solberg-g@enron.com\"}), (e2:Employee {emailaddress: \"lokey-t@enron.com\"}) "
+                        "MATCH (e1:Employee {emailaddress: " + source + "}), (e2:Employee {emailaddress: " + target + "}) "
                         "CALL gds.beta.shortestPath.dijkstra.stream({ "
                         "nodeQuery: 'MATCH (e:Employee) RETURN id(e) as id', "
                         "relationshipQuery: 'MATCH (e3:Employee)-[r:BI]-(e4:Employee) WHERE r.amount > 4 RETURN id(e3) as source, id(e4) as target, r.amount as weight', "
