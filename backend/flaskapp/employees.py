@@ -37,11 +37,11 @@ def get_all_employees(current_user):
     return json.dumps(all_employees), 200
 
 
-@employees.route('/get_employee_info', methods=['GET'])
+@employees.route('/get_employee_info', methods=['POST'])
 @token_required
 def get_employee_info(current_user):
     print("the current user: ", current_user)
-    eid = request.get_json()['eid']
+    eid = request.get_json()['data']['eid']
     #x = datetime(2001, 1, 1)
     #y = datetime(2001, 5, 27)
     employee = Employee.query.filter_by(eid=eid).all()[0]
@@ -51,17 +51,17 @@ def get_employee_info(current_user):
     mid_list: list = []
     for message in messages:
         #currdate = datetime.strptime(message.date, '%Y-%m-%d %H:%M:%S')
-        if message.sender == employee.email_id: #and currdate > x and currdate < y:
+        if message.sender == employee.email_id:  # and currdate > x and currdate < y:
             mid_list.append(message.mid)
 
     list_of_employee_dict = []
-    list_emp = [] 
+    list_emp = []
     recipients = Recipient.query.all()
     emails_sent = 0
     print(len(mid_list))
     for r in recipients:
         if r.mid in mid_list:
-            if r.rtype=='TO':
+            if r.rtype == 'TO':
                 emails_sent += 1
                 if len(list_of_employee_dict) == 0:
                     list_of_employee_dict.append({

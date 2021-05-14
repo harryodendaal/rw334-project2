@@ -123,12 +123,9 @@ export const Employees = () => {
           <div>
             <h1>Total messages sent: {totalMessages}</h1>
             <ul>
+              <h2>Most contacted employees</h2>
               {employeeData.map((object, index) => {
-                return (
-                  <li key={index}>
-                    <p>{object.employee}</p>
-                  </li>
-                );
+                return <p key={index}>{object.employee}</p>;
               })}
             </ul>
           </div>
