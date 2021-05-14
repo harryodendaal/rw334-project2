@@ -2,9 +2,10 @@ import json
 import csv
 
 from .auth import token_required
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from .database.models.enron import Employee, Recipient, Message
 from .database.models import db
+#from datetime import datetime
 employees = Blueprint('employees', __name__)
 
 
@@ -12,6 +13,19 @@ employees = Blueprint('employees', __name__)
 @token_required
 def get_all_employees(current_user):
     employees = Employee.query.all()
+    # messages = Message.query.all()
+    # print(messages)
+    # i = 0
+    # for m in messages:
+    #     # print(m)
+    #     db.session.delete(m)
+    #     if i % 20000 == 0:
+    #         print('20000 messages')
+    #         print(m)
+    #         db.session.commit()
+    #     i += 1
+    # db.session.commit()
+    # print(employees)
     all_employees: list = []
     for e in employees:
         all_employees.append({
@@ -23,27 +37,32 @@ def get_all_employees(current_user):
     return json.dumps(all_employees), 200
 
 
-@employees.route('/get_employee_info', methods=['POST'])
+@employees.route('/get_employee_info', methods=['GET'])
 @token_required
 def get_employee_info(current_user):
-    eid = request.get_json()['data']['eid']
-
+    print("the current user: ", current_user)
+    eid = request.get_json()['eid']
+    #x = datetime(2001, 1, 1)
+    #y = datetime(2001, 5, 27)
     employee = Employee.query.filter_by(eid=eid).all()[0]
     # number of emails sent in total
 
     messages = Message.query.all()
     mid_list: list = []
-    emails_sent: int = 0
     for message in messages:
-        if message.sender == employee.email_id:
+        #currdate = datetime.strptime(message.date, '%Y-%m-%d %H:%M:%S')
+        if message.sender == employee.email_id: #and currdate > x and currdate < y:
             mid_list.append(message.mid)
-            emails_sent = emails_sent + 1
 
     list_of_employee_dict = []
+    list_emp = [] 
     recipients = Recipient.query.all()
+    emails_sent = 0
+    print(len(mid_list))
     for r in recipients:
         if r.mid in mid_list:
-            if r.rvalue.find('enron') != -1:
+            if r.rtype=='TO':
+                emails_sent += 1
                 if len(list_of_employee_dict) == 0:
                     list_of_employee_dict.append({
                         "employee": r.rvalue,
@@ -69,6 +88,10 @@ def get_employee_info(current_user):
 
     # now just need to extract the top 5
     # i dont understand this code hav
+
+    for x in list_of_employee_dict:
+        if x['employee'] == 'undisclosed-recipients@enron.com':
+            list_of_employee_dict.remove(x)
     newList = sorted(list_of_employee_dict,
                      key=lambda k: k['messages_sent'], reverse=True)
     if len(newList) > 5:
@@ -76,6 +99,7 @@ def get_employee_info(current_user):
     else:
         newnewlist = newList
     newnewlist.append({"totalMessages": emails_sent})
+
     return json.dumps(newnewlist), 200
 
     # query firstname
@@ -85,52 +109,20 @@ def get_employee_info(current_user):
     # query messages, see how many messages has sender field that's equal to employee email_id field.
     # make list of all employees this employee has sent emails to
     # retrieve top 5 employees based on amount of emails.
-    employee = Employee.query.filter_by(eid=id).first()
-    messages = Message.query.filter_by(sender=employee.email_id)
-    messages_amount = 0
-    recipient_employees = {}
-
-    for message in messages:
-        messages_amount += 1
-        recipient = Recipient.query.filter_by(mid=message.mid).first()
-        if recipient.eid:
-            if recipient_employees[recipient.eid]:
-                recipient_employees[recipient.eid] = recipient_employees[recipient.eid] + 1
-            else:
-                recipient_employees[recipient.eid] = 1
-
-    sorted_keys = sorted(recipient_employees, key=recipient_employees.get)
-
-    j = 0
-    top_5 = {}
-    for w in sorted_keys:
-        if j == 5:
-            break
-        top_5[w] = recipient_employees[w]
-        j += 1
-
-    return jsonify(top_5)
-
 
 
 @employees.route('/fillrelationships', methods=['GET'])
 def fill_recipient_relationships():
     recipients = Recipient.query.all()
 
-    print('fill relationships')
-    i = 0
     for recipient in recipients:
         employee = Employee.query.filter_by(email_id=recipient.rvalue).first()
         if employee:
-            if recipient.eid == None:
-                recipient.eid = employee.eid
-                if i % 5000 == 0:
-                    db.session.commit()
-                    print(recipient)
-                i += 1
-    db.session.commit()
-    
+            recipient.eid = employee.eid
+            db.session.commit()
+            print(recipient)
 
+    print('fill relationships')
     return json.dumps({}), 200
 
 
