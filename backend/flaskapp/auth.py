@@ -14,7 +14,6 @@ auth = Blueprint('auth', __name__)
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
-        print('hello')
         token = None
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']

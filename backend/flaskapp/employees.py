@@ -36,11 +36,10 @@ def get_all_employees(current_user):
     return json.dumps(all_employees), 200
 
 
-@employees.route('/get_employee_info', methods=['GET'])
+@employees.route('/get_employee_info', methods=['POST'])
 @token_required
 def get_employee_info(current_user):
-    print("the current user: ", current_user)
-    eid = request.get_json()['eid']
+    eid = request.get_json()['data']['eid']
 
     employee = Employee.query.filter_by(eid=eid).all()[0]
     # number of emails sent in total

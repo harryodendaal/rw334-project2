@@ -8,6 +8,8 @@ export const Employees = () => {
   const [searchFirstname, setSearchFirstname] = useState("");
   const [searchLastname, setSearchLastname] = useState("");
   const [loading, setLoading] = useState(true);
+  const [employeeData, setEmployeeData] = useState("");
+  const [totalMessages, setTotalMessages] = useState("");
   function removeNull(array) {
     return array.filter((x) => x.firstname !== null);
   }
@@ -50,32 +52,43 @@ export const Employees = () => {
     }
   }, [searchLastname, employees]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (employees.length !== 0) {
       setFilteredEmployees(
-        employees.filter((e) =>
-          e.lastname.toLowerCase().includes(searchLastname.toLowerCase()) &&
-          e.firstname.toLowerCase().includes(searchFirstname.toLowerCase())
+        employees.filter(
+          (e) =>
+            e.lastname.toLowerCase().includes(searchLastname.toLowerCase()) &&
+            e.firstname.toLowerCase().includes(searchFirstname.toLowerCase())
         )
       );
     }
   }, [searchLastname, searchFirstname, employees]);
 
   const handleClick = (eid) => {
-    console.log(eid);
-    // axiosInstance
-    //   .post("employees/newendpoint", {
-    //     headers: {
-    //       "x-access-token": localStorage.getItem("token"),
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //     alert(e);
-    //   });
+    alert("wait 20 seks. efficiency not important");
+    axiosInstance
+      .post(
+        "employees/get_employee_info",
+        {
+          data: {
+            eid: eid,
+          },
+        },
+        {
+          headers: {
+            "x-access-token": localStorage.getItem("token"),
+          },
+          timeout: 28000,
+        }
+      )
+      .then((res) => {
+        setEmployeeData(res.data);
+        setTotalMessages(res.data.reverse()[0]["totalMessages"]);
+      })
+      .catch((e) => {
+        console.log(e);
+        alert(e);
+      });
   };
   if (loading) {
     return <p>Loading Employees...</p>;
@@ -102,6 +115,11 @@ export const Employees = () => {
         </div>
       </div>
       <div className={styled.container}>
+        {employeeData === "" ? (
+          <h1>No employe selected</h1>
+        ) : (
+          <h1>Total messages sent: {totalMessages}</h1>
+        )}
         <h2>All Employees:</h2>
         <div className={styled.employees}>
           {filteredEmployees?.map(({ firstname, lastname, eid }) => (
