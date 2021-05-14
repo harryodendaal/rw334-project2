@@ -50,6 +50,17 @@ export const Employees = () => {
     }
   }, [searchLastname, employees]);
 
+    useEffect(() => {
+    if (employees.length !== 0) {
+      setFilteredEmployees(
+        employees.filter((e) =>
+          e.lastname.toLowerCase().includes(searchLastname.toLowerCase()) &&
+          e.firstname.toLowerCase().includes(searchFirstname.toLowerCase())
+        )
+      );
+    }
+  }, [searchLastname, searchFirstname, employees]);
+
   const handleClick = (eid) => {
     console.log(eid);
     // axiosInstance
