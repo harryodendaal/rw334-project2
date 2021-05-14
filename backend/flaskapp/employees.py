@@ -82,8 +82,15 @@ def get_employee_info(current_user):
                             x['messages_sent'] += 1
 
     # now just need to extract the top 5
-
-    return json.dumps(list_of_employee_dict), 200
+    # i dont understand this code hav
+    newList = sorted(list_of_employee_dict,
+                     key=lambda k: k['messages_sent'], reverse=True)
+    if len(newList) > 5:
+        newnewlist = newList[:5]
+    else:
+        newnewlist = newList
+    newnewlist.append({"totalMessages": emails_sent})
+    return json.dumps(newnewlist), 200
 
     # query firstname
     # query lastname
