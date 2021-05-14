@@ -19,8 +19,10 @@ def graphs_home(current_user):
 @graphs.route('/shortest-path')
 @token_required
 def graphs_shortest_path(current_user):
+    source_email = request.args.get('source_email')
+    target_email = request.args.get('target_email')
     graph = GraphVisualization(config.NEO4J_URL, config.NEO4J_USERNAME, config.NEO4J_PASSWORD)
-    data = graph.call_shortest_path()
+    data = graph.call_shortest_path(source_email, target_email)
     graph.close()
     return jsonify(data)
 

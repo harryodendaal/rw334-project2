@@ -9,7 +9,7 @@
     border-right-width: 72px;
     border-radius: 5px;
     width: page;
-    height: 150px;
+    height: 240px;
 
 
     display: inline-block;
@@ -35,4 +35,9 @@
 
 h1{
     font-family: "Lucida Console", monospace;
+}
+
+input {
+    margin-right: 10px;
+    margin-bottom: 50px;
 }

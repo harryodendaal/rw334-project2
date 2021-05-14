@@ -136,9 +136,12 @@ export const drawGraph = (data, visType) => {
               }
               // Centrality
               if(visType === 'centrality') {
-                let color = (d.score - 1.2 / (4.34 - 1.2)) * 255;
-                let color2 = 255 - color;
-                return 'rgb(' + color + ',0 ,' + color2 + ')';
+                let score_color = (d.score - 2 / (4.34 - 2)) * 255;
+                if (score_color < 0) {
+                  score_color = 0;
+                }
+                let color = 40 + score_color;
+                return 'rgb(' + color + ',' + 100 + ',' + (150-color) + ')';
               }
               // Label propagation
               if(visType === 'label-propagation') {
@@ -148,8 +151,17 @@ export const drawGraph = (data, visType) => {
             })
             .call(drag(simulation));
 
-      node.append("title")
-            .text(d => d.emailaddress);
+      if (visType === 'social-network') {
+        node.append("title")
+            .text(d => d.firstname + ' ' + d.lastname);
+      } else if (visType === 'centrality') {
+        node.append("title")
+            .text(d => 'Email: ' + d.emailaddress + '\nScore: ' + d.score.toFixed(2));
+      } else { 
+        node.append("title")
+            .text(d => 'Email: ' + d.emailaddress);
+      }
+      
     } else {
       return
     }
